@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PortTrack — Port Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">🛳️</span>
+      <span class="brand-name">PortTrack</span>
+    </div>
+
+    <nav class="nav" id="mainNav">
+      <button class="nav-link active" data-section="dashboard">Dashboard</button>
+      <button class="nav-link" data-section="vessels">Vessels &amp; Berths</button>
+      <button class="nav-link" data-section="cargo">Cargo</button>
+      <button class="nav-link" data-section="billing">Billing</button>
+      <button class="nav-link" data-section="customs">Customs</button>
+    </nav>
+
+    <div class="account" id="accountBox">
+      <p class="account-status" id="accountStatus">Not signed in</p>
+      <button class="btn btn-ghost" id="authToggleBtn">Sign in</button>
+    </div>
+  </aside>
+
+  <main class="content">
+
+    <!-- AUTH -->
+    <section class="module active" id="section-auth">
+      <h1>Sign in to PortTrack</h1>
+      <p class="lede">Port staff, agents and customs officials use one account system.</p>
+
+      <div class="auth-grid">
+        <form class="panel form" id="loginForm">
+          <h2>Sign in</h2>
+          <label>Email<input type="email" name="email" required></label>
+          <label>Password<input type="password" name="password" required></label>
+          <button class="btn btn-primary" type="submit">Sign in</button>
+          <p class="form-msg" id="loginMsg"></p>
+        </form>
+
+        <form class="panel form" id="registerForm">
+          <h2>Create account</h2>
+          <label>Name<input type="text" name="name" required></label>
+          <label>Email<input type="email" name="email" required></label>
+          <label>Password<input type="password" name="password" required></label>
+          <label>Role
+            <select name="role">
+              <option value="staff">Staff</option>
+              <option value="agent">Shipping agent</option>
+              <option value="customs">Customs official</option>
+            </select>
+          </label>
+          <button class="btn btn-primary" type="submit">Create account</button>
+          <p class="form-msg" id="registerMsg"></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="module" id="section-dashboard">
+      <h1>Dashboard</h1>
+      <p class="lede">Live status across berths, vessels, cargo and billing.</p>
+
+      <div class="stat-strip" id="statStrip">
+        <div class="stat"><span class="stat-value" id="statBerths">—</span><span class="stat-label">Berths free</span></div>
+        <div class="stat"><span class="stat-value" id="statVessels">—</span><span class="stat-label">Vessels scheduled</span></div>
+        <div class="stat"><span class="stat-value" id="statCargo">—</span><span class="stat-label">Tons in transit</span></div>
+        <div class="stat"><span class="stat-value" id="statUnpaid">—</span><span class="stat-label">Unpaid invoices</span></div>
+        <div class="stat"><span class="stat-value" id="statRevenue">—</span><span class="stat-label">Revenue collected</span></div>
+      </div>
+
+      <button class="btn btn-ghost" id="refreshDashboard">Refresh</button>
+    </section>
+
+    <!-- VESSELS & BERTHS -->
+    <section class="module" id="section-vessels">
+      <h1>Vessels &amp; Berths</h1>
+      <p class="lede">Schedule arrivals and departures. Conflicts on the same berth are blocked automatically.</p>
+
+      <div class="two-col">
+        <div class="panel">
+          <h2>Add berth</h2>
+          <form class="form form-inline" id="berthForm">
+            <label>Code<input type="text" name="code" placeholder="B1" required></label>
+            <label>Capacity (tons)<input type="number" name="capacity_tons" placeholder="5000"></label>
+            <button class="btn btn-primary" type="submit">Add berth</button>
+          </form>
+          <p class="form-msg" id="berthMsg"></p>
+          <table class="table" id="berthTable">
+            <thead><tr><th>Code</th><th>Capacity</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h2>Schedule vessel</h2>
+          <form class="form form-inline" id="vesselForm">
+            <label>Vessel name<input type="text" name="name" required></label>
+            <label>IMO number<input type="text" name="imo_number"></label>
+            <label>Type
+              <select name="vessel_type">
+                <option value="cargo">Cargo</option>
+                <option value="container">Container</option>
+                <option value="tanker">Tanker</option>
+                <option value="passenger">Passenger</option>
+              </select>
+            </label>
+            <label>Berth
+              <select name="berth_id" id="berthSelect"></select>
+            </label>
+            <label>Arrival<input type="datetime-local" name="arrival_time" required></label>
+            <label>Departure<input type="datetime-local" name="departure_time" required></label>
+            <button class="btn btn-primary" type="submit">Schedule vessel</button>
+          </form>
+          <p class="form-msg" id="vesselMsg"></p>
+        </div>
+      </div>
+
+      <table class="table" id="vesselTable">
+        <thead><tr><th>Vessel</th><th>Type</th><th>Berth</th><th>Arrival</th><th>Departure</th><th>Status</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- CARGO -->
+    <section class="module" id="section-cargo">
+      <h1>Cargo &amp; Containers</h1>
+      <p class="lede">Track cargo from loading through yard storage to dispatch.</p>
+
+      <div class="panel">
+        <h2>Record cargo</h2>
+        <form class="form form-inline" id="cargoForm">
+          <label>Vessel
+            <select name="vessel_id" id="cargoVesselSelect"></select>
+          </label>
+          <label>Description<input type="text" name="description" required></label>
+          <label>Weight (tons)<input type="number" name="weight_tons" required></label>
+          <label>Container #<input type="text" name="container_number"></label>
+          <label>Yard location<input type="text" name="yard_location" placeholder="Yard-A-1"></label>
+          <button class="btn btn-primary" type="submit">Record cargo</button>
+        </form>
+        <p class="form-msg" id="cargoMsg"></p>
+      </div>
+
+      <table class="table" id="cargoTable">
+        <thead><tr><th>Container</th><th>Description</th><th>Vessel</th><th>Weight</th><th>Yard</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- BILLING -->
+    <section class="module" id="section-billing">
+      <h1>Billing &amp; Invoicing</h1>
+      <p class="lede">Charges are computed automatically from berth hire, cargo handling and storage.</p>
+
+      <div class="panel">
+        <h2>Generate invoice</h2>
+        <form class="form form-inline" id="invoiceForm">
+          <label>Vessel
+            <select name="vessel_id" id="invoiceVesselSelect"></select>
+          </label>
+          <button class="btn btn-primary" type="submit">Generate invoice</button>
+        </form>
+        <p class="form-msg" id="invoiceMsg"></p>
+      </div>
+
+      <table class="table" id="invoiceTable">
+        <thead><tr><th>Vessel</th><th>Berth hire</th><th>Cargo handling</th><th>Storage</th><th>Total</th><th>Status</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- CUSTOMS -->
+    <section class="module" id="section-customs">
+      <h1>Customs Clearance</h1>
+      <p class="lede">Clearing a shipment automatically marks its cargo dispatched.</p>
+
+      <div class="panel">
+        <h2>Open clearance</h2>
+        <form class="form form-inline" id="customsForm">
+          <label>Cargo
+            <select name="cargo_id" id="customsCargoSelect"></select>
+          </label>
+          <label>Shipping bill #<input type="text" name="shipping_bill_number"></label>
+          <label>Manifest #<input type="text" name="manifest_number"></label>
+          <button class="btn btn-primary" type="submit">Open clearance</button>
+        </form>
+        <p class="form-msg" id="customsMsg"></p>
+      </div>
+
+      <table class="table" id="customsTable">
+        <thead><tr><th>Cargo</th><th>Shipping bill</th><th>Manifest</th><th>Status</th><th>Update</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+  </main>
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>
